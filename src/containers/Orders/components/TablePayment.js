@@ -32,11 +32,36 @@ const TablePayment = ({ searchQuery, sortOrder }) => {
     fetchOrders();
   }, []);
 
-  const filterOrders = (orders) => {
-    return orders.filter(order =>
-      order.paidBy.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  };
+
+const filterOrders = (orders) => {
+  if (!searchQuery) {
+    return orders;
+  }
+  return orders.filter((order) =>
+    (order.paidBy?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    (order.datePaid?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    (order.paidAmount?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    (order.orderId?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    (order.paymentGateway?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    (order.paymentMethod?.toLowerCase()?.includes(searchQuery.toLowerCase())) 
+   
+  );
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   const sortOrders = (orders) => {
     switch (sortOrder) {

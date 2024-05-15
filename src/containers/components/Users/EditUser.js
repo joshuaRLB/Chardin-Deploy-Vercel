@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { auth, firestore, collection, addDoc, getDoc, doc, updateDoc } from "../../../api/firebaseScript";
+import { auth, firestore, getDoc, doc, updateDoc, EmailAuthProvider, signInWithEmailAndPassword, reauthenticateWithCredential, updatePassword } from "../../../api/firebaseScript";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import Card from "../../Orders/components/Card/Card";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
+import CryptoJS from 'crypto-js'; // Import CryptoJS
 
 const EditUser = () => {
   const { userID } = useParams();
@@ -21,8 +22,13 @@ const EditUser = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
+
   useEffect(() => {
-    const fetchOrder = async () => {
+    const fetchUser = async () => {
       try {
         const userDoc = await getDoc(doc(firestore, "users", userID));
         if (userDoc.exists()) {
@@ -35,48 +41,57 @@ const EditUser = () => {
           console.log("No such document!");
         }
       } catch (error) {
-        console.error("Error fetching order:", error);
+        console.error("Error fetching user:", error);
       }
     };
 
-    fetchOrder();
-    console.log("user Data", firstName +" "+lastName +" "+userID)
+    fetchUser();
   }, [userID]);
 
   const updateUserdata = async () => {
-    // Check if any required field is empty
-    if (!firstName || !lastName || !emailAddress || !mobileNumber || !password || !confirmPassword) {
+    if (!firstName || !lastName || !emailAddress || !mobileNumber) {
       alert("Please input all fields");
       return;
     }
 
-    // Check if password and confirm password match
     if (password !== confirmPassword) {
       alert("Password and Confirm Password do not match");
       return;
     }
 
     const userRef = doc(firestore, "users", userID);
+
+    try {
+     
+
+      if (password) {
+        const encryptedPassword = localStorage.getItem(`password_${userID}`);
+        const userPassword = CryptoJS.AES.decrypt(encryptedPassword, '<JHGFytguhkjhjgvcfrhtfjgh').toString(CryptoJS.enc.Utf8);
+        // console.log("4567password", "edit - "+CryptoJS.AES.encrypt("123456789", '<JHGFytguhkjhjgvcfrhtfjgh').toString())
+       
+        const userCredential = await signInWithEmailAndPassword(auth, emailAddress, userPassword);
+        await updatePassword(userCredential.user, password);
+        console.log("Password updated successfully");
+        
+      }
     const newData = {
       firstName: firstName,
       lastName: lastName,
       emailAddress: emailAddress,
       phoneNumber: mobileNumber,
-      password: password
+      password: CryptoJS.AES.encrypt(password, '<JHGFytguhkjhjgvcfrhtfjgh').toString()
     };
-
-    try {
-      await updateDoc(userRef, newData);
-      alert("User information edited successfully!")
-      navigate(-1);
+     await updateDoc(userRef, newData);
+      alert("User updated successfully");
+       navigate(-1);
     } catch (error) {
-      console.error("Error updating user: ", error);
+      console.error("Error updating user:", error);
     }
   };
 
-  const userDetails = [
+ const userDetails = [
     {
-      bordered: true,
+      bordered: false,
       fields: [
         {
           fieldType: "input",
@@ -85,7 +100,7 @@ const EditUser = () => {
           placeholder: firstName,
           width: 6,
           id: "firstName",
-        },
+        }, 
         {
           fieldType: "input",
           label: "Last Name",
@@ -94,12 +109,16 @@ const EditUser = () => {
           width: 6,
           id: "lastName",
         },
+      ],
+    },{
+      bordered: true,
+      fields: [
         {
           fieldType: "input",
           label: "Email Address",
           placeholder: emailAddress,
           type: "text",
-          width: 4,
+          width: 8,
           id: "emailAddress",
         },
         {
@@ -107,10 +126,10 @@ const EditUser = () => {
           label: "Mobile Number",
           type: "tel",
           placeholder: mobileNumber,
-          width: 2,
+          width: 4,
           id: "mobileNumber",
         },
-      ],
+      ]
     },
     {
       bordered: false,
@@ -120,7 +139,7 @@ const EditUser = () => {
           label: "Password",
           type: "password",
           placeholder: password,
-          width: 4,
+          width: 6,
           id: "password",
         },
         {
@@ -128,15 +147,14 @@ const EditUser = () => {
           label: "Confirm Password",
           type: "password",
           
-          width: 4,
+          width: 6,
           id: "confirmPassword",
         },
       ],
     },
   ];
-
-  const handleInputChange = (fieldName, value) => {
-    switch (fieldName) {
+  const handleInputChange = (title, value) => {
+    switch (title) {
       case "First Name":
         setFirstName(value);
         break;
@@ -160,10 +178,12 @@ const EditUser = () => {
     }
   };
 
-  return (
+   return (
     <div id="page-top">
       <div id="wrapper">
-        <Sidebar />
+        <Sidebar 
+         isSidebarCollapsed={isSidebarCollapsed}
+         toggleSidebar={toggleSidebar}/>
         <div id="content-wrapper" className="d-flex flex-column">
           <div id="content">
             <Navbar />
@@ -172,28 +192,33 @@ const EditUser = () => {
                 <div className="col-lg-12">
                   <div className="card">
                     <div className="card-title d-flex justify-content-between align-items-center">
-                      <h1 className="heading text-white">
-                        <button className="btn d-flex align-items-center" onClick={goBack}>
+                    <h1 className="heading text-white">
+                        <button
+                          className="btn d-flex align-items-center"
+                          onClick={goBack}
+                        >
                           <FaArrowLeft className="mr-3" />
                           Back
                         </button>
                       </h1>
+                      <button
+                        className="btn btn-green mr-2 d-flex align-items-center"
+                        onClick={updateUserdata}
+                      >
+                        <FaArrowRight className="mr-3" />
+                        <h1 className="heading">Save Changes</h1>
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
               <form>
                 <div className="row">
-                  <div className="col-lg-12">
-                    <Card header="Edit User" subheading="" rows={userDetails} onChange={handleInputChange} />
+                  <div className="col-lg-8 mt-4">
+                    <Card header="Edit User" rows={userDetails} onChange={handleInputChange} />
                   </div>
                 </div>
               </form>
-              <br />
-              <button className="btn btn-green mr-2 d-flex align-items-center" onClick={updateUserdata}>
-                <FaArrowRight className="mr-3" />
-                <h1 className="heading">Update User</h1>
-              </button>
             </div>
           </div>
         </div>

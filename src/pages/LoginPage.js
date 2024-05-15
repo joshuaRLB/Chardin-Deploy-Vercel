@@ -1,19 +1,33 @@
 import { useState, useEffect } from 'react';
-import { auth, signInWithEmailAndPassword } from '../api/firebaseScript'; // Adjust the path as per your folder structure
-
+import { auth, signInWithEmailAndPassword, firestore, collection, query, where, getDocs } from '../api/firebaseScript'; // Adjust the path as per your folder structure
 import { useNavigate } from "react-router-dom";
+import CryptoJS from 'crypto-js';
+
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
- const navigate = useNavigate();
+  const navigate = useNavigate();
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // Authentication successful, redirect or perform actions accordingly
-      const user = auth.currentUser;
-        localStorage.setItem('email', email);
+      // Authentication successful, encrypt and store the password
+      const encryptedPassword = CryptoJS.AES.encrypt(password, 'secret key').toString();
+      localStorage.setItem('email', email);
+      localStorage.setItem('password', encryptedPassword);
+
+      // Fetch user details from Firestore
+      const q = query(collection(firestore, 'users'), where('emailAddress', '==', email));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        const userData = doc.data();
+        const { firstName, lastName } = userData;
+        localStorage.setItem('firstName', firstName);
+        localStorage.setItem('lastName', lastName);
+      });
+
       navigate("/admin");
       console.log('User logged in successfully');
     } catch (error) {
@@ -21,7 +35,8 @@ const LoginPage = () => {
       console.error('Error signing in:', error.message);
     }
   };
-   useEffect(() => {
+
+  useEffect(() => {
     // Check if the user is already logged in
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
@@ -30,7 +45,8 @@ const LoginPage = () => {
     });
 
     return unsubscribe;
-  }, []);
+  }, [navigate]);
+
   return (
     <div>
       <div className="bg-dark-gray min-vh-100 d-flex justify-content-center align-items-center">
@@ -39,7 +55,6 @@ const LoginPage = () => {
             <div className="col-xl-10 col-lg-12 col-md-9">
               <div className="card o-hidden border-0 shadow-lg my-5">
                 <div className="card-body p-0">
-                  {/* <!-- Nested Row within Card Body --> */}
                   <div className="row">
                     <div className="col-lg-6 d-none d-lg-block bg-login-image"></div>
                     <div className="col-lg-6">

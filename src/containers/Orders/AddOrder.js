@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { auth, firestore, collection, addDoc } from "../../api/firebaseScript"; // Import Firebase functions
-
-import ArrowBack from "../../assets/Arrow-back.svg";
-import ArrowNext from "../../assets/Arrow-next.svg";
-import ArrowBackHover from "../../assets/Arrow-back-hover.svg";
+import { auth, firestore, collection, addDoc } from "../../api/firebaseScript";
 
 import { FaArrowLeft } from "react-icons/fa6";
 import { FaArrowRight } from "react-icons/fa6";
@@ -50,26 +46,6 @@ const AddOrder = () => {
   const [depositAmount, setDepositAmount] = useState("");
   const [totalAmount, setTotalAmount] = useState("");
   const [address, setAddress] = useState("");
-
-  const [item1Name, setItem1Name] = useState("");
-  const [item1Price, setItem1Price] = useState("");
-  const [item1Qty, setItem1Qty] = useState("");
-
-  const [item2Name, setItem2Name] = useState("");
-  const [item2Price, setItem2Price] = useState("");
-  const [item2Qty, setItem2Qty] = useState("");
-
-  const [item3Name, setItem3Name] = useState("");
-  const [item3Price, setItem3Price] = useState("");
-  const [item3Qty, setItem3Qty] = useState("");
-
-  const [item4Name, setItem4Name] = useState("");
-  const [item4Price, setItem4Price] = useState("");
-  const [item4Qty, setItem4Qty] = useState("");
-
-  const [item5Name, setItem5Name] = useState("");
-  const [item5Price, setItem5Price] = useState("");
-  const [item5Qty, setItem5Qty] = useState("");
 
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
@@ -147,7 +123,7 @@ const AddOrder = () => {
       case "Email":
         setEmail(value);
         break;
-      case "Date Ordered":
+      case "Purchase Date":
         setFilledDate(value);
         break;
       case "Status":
@@ -174,7 +150,7 @@ const AddOrder = () => {
     setStatus(event.target.value);
   };
 
-  const handleSubmit = async (event) => {
+ const handleSubmit = async (event) => {
   event.preventDefault();
 
   // Check if any required field is empty
@@ -188,9 +164,28 @@ const AddOrder = () => {
     address === "" ||
     status === ""
   ) {
+    console.log("userDataDetails", customerName+" - "+mobileNumber+" - "+eventDate+" - "+filledDate+" - "+jobOrderNo+" - "+depositAmount+" - "+address+" - "+status)
     // If any required field is empty, show a modal prompting the user to fill all required fields
+    setShowErrorMessage("Please fill all required fields.");
     setShowErrorModal(true);
     return;
+  }
+
+  // Check if items array is empty
+  if (items.length === 0) {
+    setShowErrorMessage("Please add at least one item.");
+    setShowErrorModal(true);
+    return;
+  }
+
+  // Check if any item has missing fields
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (item.name === "" || item.price === "" || item.qty === "") {
+      setShowErrorMessage("Please fill all fields for each item.");
+      setShowErrorModal(true);
+      return;
+    }
   }
 
   // Compute total price based on items
@@ -218,7 +213,7 @@ const AddOrder = () => {
     order[`item${index + 1}price`] = item.price;
     order[`item${index + 1}qty`] = item.qty;
   });
-  //
+
   try {
     // Add the order to Firestore
     const docRef = await addDoc(collection(firestore, "orders"), order);
@@ -330,7 +325,7 @@ const AddOrder = () => {
       fields: [
         {
           fieldType: "input",
-          label: "Filled Date/Date Ordered",
+          label: "Purchase Date",
           type: "date",
           width: 6,
           value: { formattedDate },
@@ -494,14 +489,6 @@ const handleRemoveItem = (indexToRemove) => {
                           Back
                         </button>
                       </h1>
-                      <button
-                        type="submit"
-                        className="btn btn-green mr-2 d-flex align-items-center"
-                        onClick={handleSubmit}
-                      >
-                        <FaArrowRight className="mr-3" />
-                        <h1 className="heading">Proceed to Order</h1>
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -515,23 +502,6 @@ const handleRemoveItem = (indexToRemove) => {
                       rows={CardCustomerDetails}
                       onChange={handleInputChange}
                     />
-                    {/* I have commented the select here for visual difference */}
-                    {/* <div className="form-group">
-                      <label htmlFor="fittingSchedule">Status</label>
-                      <select
-                        className="form-control"
-                        id="fittingSchedule"
-                        value={status}
-                        onChange={handleFittingChange}
-                      >
-                        <option value="">Select status</option>
-                        {fittingOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    </div> */}
                   </div>
                   <div className="col-lg-6 mt-4">
                     <Card
@@ -551,46 +521,12 @@ const handleRemoveItem = (indexToRemove) => {
                       rows={CardAddItems}
                       onChange={handleInputChange}
                     />
-                    {/* Commented */}
-                    {/* <button
-                      type="button"
-                      className="btn btn-green mr-2 d-flex align-items-center"
-                      onClick={handleAddItem}
-                    >
-                      Add Item
-                    </button> */}
-
-                    {/* <label className="w-100 card-input-label">
-                      Total Price
-                    </label>
-                    <input
-                      type="number"
-                      disabled
-                      className="w-100 card-input mb-2"
-                      value={totalAmount}
-                    />
-                    <label className="w-100 card-input-label">Balance</label>
-                    <input
-                      type="number"
-                      disabled
-                      className="w-100 card-input mb-2"
-                      value={Math.max(totalAmount - depositAmount, 0)}
-                    /> */}
                   </div>
                 </div>
               </form>
 
               <div className="card mt-4">
-                    <div className="card-title d-flex justify-content-between align-items-center">
-                      <h1 className="heading text-white">
-                        <button
-                          className="btn d-flex align-items-center"
-                          onClick={goBack}
-                        >
-                          <FaArrowLeft className="mr-3" />
-                          Back
-                        </button>
-                      </h1>
+                    <div className="card-title d-flex justify-content-end align-items-center">
                       <button
                         type="submit"
                         className="btn btn-green mr-2 d-flex align-items-center"

@@ -77,9 +77,6 @@ const OrderModal = ({ orderData, isOpen, onClose }) => {
                   <h6 className="text-title-reg text-dark text-end">
                     Filed on {orderData.filledupDate}
                   </h6>
-                   <h6 className="text-title-reg text-dark text-end">
-                    Filed By {orderData?.filledBy}
-                  </h6>
                 </div>
               </div>
 
@@ -134,7 +131,7 @@ const OrderModal = ({ orderData, isOpen, onClose }) => {
                 Close
               </button> */}
                <div className="subheading">
-                  Ordered added by {orderData.fullName}
+                  Order added by {orderData?.filledBy}
                 </div>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { firestore } from "../../../api/firebaseScript";
 import { Link } from "react-router-dom";
 import SearchBar from "../../../components/Shared/SearchBar";
 import { format } from "date-fns"; // Import date-fns for date formatting
+import CryptoJS from 'crypto-js'; // Import CryptoJS
 
 const TableUser = () => {
   const [users, setUsers] = useState([]);
@@ -38,7 +39,11 @@ const TableUser = () => {
       return users;
     }
     return users.filter((user) =>
-      user.firstName.toLowerCase().includes(query.toLowerCase())
+      user.firstName?.toLowerCase()?.includes(query.toLowerCase()) || 
+      user.addedBy?.toLowerCase()?.includes(query.toLowerCase()) || 
+      user.emailAddress?.toLowerCase()?.includes(query.toLowerCase()) || 
+      user.lastName?.toLowerCase()?.includes(query.toLowerCase()) || 
+      user.phoneNumber?.toLowerCase()?.includes(query.toLowerCase()) 
     );
   };
 
@@ -60,6 +65,12 @@ const TableUser = () => {
 
   const filteredUsers = filterUsers(users, searchQuery);
   const sortedUsers = sortUsers(filteredUsers, sortOrder);
+
+  const handleEditClick = (user, password) => {
+    // console.log("4567password", "edit - "+CryptoJS.AES.encrypt("123456789", '<JHGFytguhkjhjgvcfrhtfjgh').toString())
+      
+    localStorage.setItem(`password_${user}`, password);
+  };
 
   return (
     <div className="table-responsive">
@@ -127,7 +138,12 @@ const TableUser = () => {
               <td>{user.addedBy} - {format(user.dateAdded, "MM-dd-yyyy")}</td> {/* Format date */}
               <td>
                 <Link to={`/admin/users/edit-user/${user.id}`} className="text-decoration-none">
-                  <button className="small-btn rounded-pill">Edit</button>
+                  <button 
+                    className="small-btn rounded-pill" 
+                    onClick={() => handleEditClick(user.id, user.password)}
+                  >
+                    Edit
+                  </button>
                 </Link>
               </td>
             </tr>

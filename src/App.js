@@ -20,43 +20,21 @@ import { auth } from './api/firebaseScript';
 import Payments from "./containers/Payments/Payments";
 import AddPayment from "./containers/Payments/AddPayment";
 import { getAuth, signOut } from "firebase/auth"; // Import getAuth and signOut
-
+import { Modal, Button } from 'react-bootstrap';
 
 function App() {
-  useEffect(() => {
-    document.title = "Chardin Davao";
-  }, []);
-
-  /* const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      setUser(user);
-    });
-    return unsubscribe;
-  }, []); */
-
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
+  const [showTimeoutModal, setShowTimeoutModal] = useState(false);
+
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      if (user) {
-        localStorage.setItem("user", JSON.stringify(user));
-        setUser(user);
-      } else {
-        localStorage.removeItem("user");
-        setUser(null);
-      }
-    });
-    
-    return unsubscribe;
+    document.title = "Chardin Davao";
   }, []);
 
-
- useEffect(() => {
+  useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
         localStorage.setItem("user", JSON.stringify(user));
@@ -70,7 +48,8 @@ function App() {
     
     return unsubscribe;
   }, []);
-   useEffect(() => {
+
+  useEffect(() => {
     const handleUserActivity = () => {
       resetSessionTimeout();
     };
@@ -83,20 +62,28 @@ function App() {
       window.removeEventListener('keypress', handleUserActivity);
     };
   }, []);
-    const resetSessionTimeout = () => {
+
+  const resetSessionTimeout = () => {
     clearTimeout(window.sessionTimeout);
+    clearTimeout(window.timeoutWarning);
+
+    window.timeoutWarning = setTimeout(() => {
+      setShowTimeoutModal(true);
+    }, 9 * 60 * 1000); // Show warning after 9 minute
+
     window.sessionTimeout = setTimeout(() => {
-      logout();
-    }, 10 * 60 * 1000); // 30 minutes
-    // }, 10 * 1000); // 10 seconds TESTING
+      // Keep session active, wait for user action on modal
+    }, 10 * 60 * 1000); // Wait for user choice after 10 minutes
   };
-   const logout = () => {
+
+  const logout = () => {
     const auth = getAuth();
     signOut(auth)
       .then(() => {
         localStorage.removeItem("user");
         setUser(null);
         clearTimeout(window.sessionTimeout);
+        clearTimeout(window.timeoutWarning);
         window.location.href = "/login"; // Redirect to login page
         console.log("User logged out successfully.");
       })
@@ -105,58 +92,47 @@ function App() {
       });
   };
 
+  const handleContinueSession = () => {
+    setShowTimeoutModal(false);
+    resetSessionTimeout();
+  };
+
   return (
     <div className="App text-white">
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route
-            path="/admin"
-            element={user ? <AdminRoutes /> : <Navigate to="/login" />}
-          />
-          
-          <Route
-            path="/admin/dashboard"
-            element={user ? <Dashboard /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/payments"
-            element={user ? <Payments /> : <Navigate to="/payments" />}
-          />
-          <Route
-            path="/admin/payments/add-payment"
-            element={user ? <AddPayment /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/orders"
-            element={user ? <OrdersPage /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/orders/add-order"
-            element={user ? <AddOrder /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/users"
-            element={user ? <UsersPage /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/users/add-user"
-            element={user ? <AddUser /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/orders/edit-order/:orderId"
-            element={user ? <EditOrder /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/admin/users/edit-user/:userID"
-            element={user ? <EditUser /> : <Navigate to="/login" />}
-          />
+          <Route path="/admin" element={user ? <AdminRoutes /> : <Navigate to="/login" />} />
+          <Route path="/admin/images" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+          <Route path="/admin/payments" element={user ? <Payments /> : <Navigate to="/payments" />} />
+          <Route path="/admin/payments/add-payment" element={user ? <AddPayment /> : <Navigate to="/login" />} />
+          <Route path="/admin/orders" element={user ? <OrdersPage /> : <Navigate to="/login" />} />
+          <Route path="/admin/orders/add-order" element={user ? <AddOrder /> : <Navigate to="/login" />} />
+          <Route path="/admin/users" element={user ? <UsersPage /> : <Navigate to="/login" />} />
+          <Route path="/admin/users/add-user" element={user ? <AddUser /> : <Navigate to="/login" />} />
+          <Route path="/admin/orders/edit-order/:orderId" element={user ? <EditOrder /> : <Navigate to="/login" />} />
+          <Route path="/admin/users/edit-user/:userID" element={user ? <EditUser /> : <Navigate to="/login" />} />
           <Route path="/design-tool" element={<DesignTool />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="*" element={<NotFoundPage />} />
           <Route path="/track-order" element={<TrackOrderPage />} />
         </Routes>
       </BrowserRouter>
+
+      <Modal show={showTimeoutModal} onHide={() => {}} backdrop="static">
+        <Modal.Header>
+          <Modal.Title>Session Timeout Warning</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Your session is about to expire. Do you want to continue your session?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={logout}>
+            Logout
+          </Button>
+          <Button variant="primary" onClick={handleContinueSession}>
+            Continue Session
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
@@ -165,7 +141,7 @@ function AdminRoutes() {
   return (
     <Routes>
       <Route index element={<Dashboard />} />
-      <Route path="dashboard" element={<Dashboard />} />
+      <Route path="images" element={<Dashboard />} />
       <Route path="orders" element={<OrdersPage />} />
       <Route path="orders/add-order" element={<AddOrder />} />
       <Route path="orders/edit-order/:orderId" element={<EditOrder />} />
@@ -176,6 +152,5 @@ function AdminRoutes() {
     </Routes>
   );
 }
-
 
 export default App;

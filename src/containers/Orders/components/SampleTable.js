@@ -44,13 +44,23 @@ const SampleTable = () => {
   };
 
   const filterOrders = (orders, query) => {
-    if (!query) {
-      return orders;
-    }
-    return orders.filter((order) =>
-      order.fullName.toLowerCase().includes(query.toLowerCase())
-    );
-  };
+  if (!query) {
+    return orders;
+  }
+  return orders.filter((order) =>
+    (order.fullName?.toLowerCase()?.includes(query.toLowerCase())) ||
+    (order.item1name?.toLowerCase()?.includes(query.toLowerCase())) ||
+    (order.item2name?.toLowerCase()?.includes(query.toLowerCase())) ||
+    (order.item3name?.toLowerCase()?.includes(query.toLowerCase())) ||
+    (order.item4name?.toLowerCase()?.includes(query.toLowerCase())) ||
+    (order.item5name?.toLowerCase()?.includes(query.toLowerCase())) ||
+    (order.jobOrderID?.toLowerCase()?.includes(query.toLowerCase())) ||
+    
+    (order.filledupDate?.toLowerCase()?.includes(query.toLowerCase())) ||
+    (order.dueDate?.toLowerCase()?.includes(query.toLowerCase())) ||
+    (order.status?.toLowerCase()?.includes(query.toLowerCase()))
+  );
+};
 
   const sortOrders = (orders, order) => {
     const sortedOrders = [...orders];
@@ -98,23 +108,23 @@ const SampleTable = () => {
             </button>
             <ul className="dropdown-menu" aria-labelledby="btnSort">
               <li>
-                <a className="dropdown-item" href="#" onClick={() => handleSort("Latest to Oldest")}>
+                <a className="dropdown-item" onClick={() => handleSort("Latest to Oldest")}>
                   Latest to Oldest
                 </a>
               </li>
               <li>
-                <a className="dropdown-item" href="#" onClick={() => handleSort("Oldest to Latest")}>
+                <a className="dropdown-item" onClick={() => handleSort("Oldest to Latest")}>
                   Oldest to Latest
                 </a>
               </li>
               <li>
-                <a className="dropdown-item" href="#" onClick={() => handleSort("A to Z")}>
-                  A to Z
+                <a className="dropdown-item" onClick={() => handleSort("A to Z")}>
+                  A to Z Client Name
                 </a>
               </li>
               <li>
-                <a className="dropdown-item" href="#" onClick={() => handleSort("Z to A")}>
-                  Z to A
+                <a className="dropdown-item" onClick={() => handleSort("Z to A")}>
+                  Z to A Client Name
                 </a>
               </li>
             </ul>
@@ -131,7 +141,7 @@ const SampleTable = () => {
             <th className="col-lg-1">ID</th>
             <th className="col-lg-1">Client</th>
             <th className="col-lg-4">Items</th>
-            <th className="col-lg-1">Filled up Date</th>
+            <th className="col-lg-1">Record Date</th>
             <th className="col-lg-1">Due Date</th>
             <th className="col-lg-1">Balance</th>
             <th className="col-lg-2">Status</th>
@@ -186,7 +196,7 @@ const SampleTable = () => {
       <div className="text-end">
         <div className="pagination justify-content-end">
           {currentPage > 1 && (
-            <a href="#" onClick={prevPage}>
+            <a onClick={prevPage}>
               &laquo; Previous
             </a>
           )}
@@ -194,7 +204,6 @@ const SampleTable = () => {
             (_, index) => (
               <a
                 key={index}
-                href="#"
                 className={currentPage === index + 1 ? "active" : ""}
                 onClick={() => setCurrentPage(index + 1)}
               >
@@ -203,7 +212,7 @@ const SampleTable = () => {
             )
           )}
           {currentPage < Math.ceil(sortedOrders.length / itemsPerPage) && (
-            <a href="#" onClick={nextPage}>
+            <a onClick={nextPage}>
               Next &raquo;
             </a>
           )}

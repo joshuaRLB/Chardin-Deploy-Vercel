@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, collection, addDoc, getDoc, doc, updateDoc } from "firebase/firestore"; // Importing firestore functions
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
+import { getFirestore, collection, addDoc, getDoc, doc, updateDoc, query, where, getDocs} from "firebase/firestore"; // Importing firestore functions
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 const firebaseConfig = {
   apiKey: "AIzaSyBmRUKC8Cj6LcSu7sCXOs-_ijIWm8dsxa8",
@@ -16,4 +16,4 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const firestore = getFirestore(app); // Initialize firestore
 
-export { getStorage, ref, uploadBytesResumable, getDownloadURL, getFirestore, auth, firestore, updateDoc, getDoc, doc, collection, addDoc, signInWithEmailAndPassword, createUserWithEmailAndPassword }; // Exporting firestore functions along with auth
+export { getStorage, ref, uploadBytesResumable, getDownloadURL, query, getDocs, where, getFirestore, updatePassword, auth, EmailAuthProvider, reauthenticateWithCredential, firestore, updateDoc, getDoc, doc, collection, addDoc, signInWithEmailAndPassword, createUserWithEmailAndPassword }; // Exporting firestore functions along with auth

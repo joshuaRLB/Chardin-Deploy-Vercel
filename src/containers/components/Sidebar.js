@@ -41,11 +41,11 @@ const Sidebar = ({ isSidebarCollapsed, toggleSidebar }) => {
         <hr className="sidebar-divider my-0 rounded" />
         <li className="nav-item">
           <Link
-            to="/admin/dashboard"
-            className={`nav-link ${isActive("/admin/dashboard") ? "active" : ""}`}
+            to="/admin/images"
+            className={`nav-link ${isActive("/admin/images") ? "active" : ""}`}
           >
-            <i className={`bi bi-speedometer ${isActive("/admin/dashboard") ? "text-white" : ""}`}></i>
-            <span>Dashboard</span>
+            <i className={`bi bi-speedometer ${isActive("/admin/images") ? "text-white" : ""}`}></i>
+            <span>Images</span>
           </Link>
         </li>
 
@@ -81,7 +81,7 @@ const Sidebar = ({ isSidebarCollapsed, toggleSidebar }) => {
             to="/admin/users"
             className={`nav-link ${isActive("/admin/users") || isActive("/admin/users/add-user") ? "active" : ""}`}
           >
-            <i className={`bi bi-person-fill ${isActive("/admin/users") || isActive("admin/users/add-user") ? "text-white" : ""}`}></i>
+            <i className={`bi bi-person-fill ${isActive("/admin/users") || isActive("/admin/users/add-user") ? "text-white" : ""}`}></i>
             <span>Users</span>
           </Link>
         </li>

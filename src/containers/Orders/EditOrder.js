@@ -8,7 +8,7 @@ import {
   addDoc,
   getDoc,
   doc,
-  updateDoc
+  updateDoc,
 } from "../../api/firebaseScript"; // Import Firebase functions
 
 import { FaArrowLeft } from "react-icons/fa6";
@@ -39,7 +39,6 @@ const customStyles = {
     textAlign: "center",
   },
 };
-
 
 const EditOrder = () => {
   const { orderId } = useParams(); // Get order ID from URL parameters
@@ -78,10 +77,9 @@ const EditOrder = () => {
 
   const [itemData, setItemData] = useState({});
 
+  const [showErrorMessage, setShowErrorMessage] = useState("");
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
-    const [showErrorMessage, setShowErrorMessage] = useState("");
-   const [showErrorModal, setShowErrorModal] = useState(false);
-  
   const handleCloseErrorModal = () => {
     setShowErrorModal(false);
   };
@@ -125,50 +123,54 @@ const EditOrder = () => {
     item5Qty,
   ]);
 
- useEffect(() => {
-  const fetchOrder = async () => {
-    try {
-      const orderDoc = await getDoc(doc(firestore, "orders", orderId));
-      if (orderDoc.exists()) {
-        const orderData = orderDoc.data();
-        // Populate state variables with order details
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const orderDoc = await getDoc(doc(firestore, "orders", orderId));
+        if (orderDoc.exists()) {
+          const orderData = orderDoc.data();
+          // Populate state variables with order details
 
-        setCustomerName(orderData.fullName);
-        setMobileNumber(orderData.phoneNumber);
-        setEventDate(orderData.dueDate);
-        setFilledDate(orderData.filledupDate);
-        setJobOrderNo(orderData.jobOrderID);
-        setDepositAmount(orderData.deposit);
-        setTotalAmount(orderData.totalprice);
-        setAddress(orderData.address);
-        setEmail(orderData.customerEmail);
-        setStatus(orderData.status);
+          setCustomerName(orderData.fullName);
+          setMobileNumber(orderData.phoneNumber);
+          setEventDate(orderData.dueDate);
+          setFilledDate(orderData.filledupDate);
+          setJobOrderNo(orderData.jobOrderID);
+          setDepositAmount(orderData.deposit);
+          setTotalAmount(orderData.totalprice);
+          setAddress(orderData.address);
+          setEmail(orderData.customerEmail);
+          setStatus(orderData.status);
 
-        // Create an object to hold item data
-        const itemData = {};
-        // Populate the item data object dynamically
-        for (let i = 1; i <= 5; i++) {
-          const itemName = orderData[`item${i}name`];
-          const itemPrice = orderData[`item${i}price`];
-          const itemQty = orderData[`item${i}qty`];
-          if (itemName) {
-            itemData[`item${i}`] = { name: itemName, price: itemPrice, qty: itemQty };
+          // Create an object to hold item data
+          const itemData = {};
+          // Populate the item data object dynamically
+          for (let i = 1; i <= 5; i++) {
+            const itemName = orderData[`item${i}name`];
+            const itemPrice = orderData[`item${i}price`];
+            const itemQty = orderData[`item${i}qty`];
+            if (itemName) {
+              itemData[`item${i}`] = {
+                name: itemName,
+                price: itemPrice,
+                qty: itemQty,
+              };
+            }
           }
+          // Set the item data object
+          setItemData(itemData);
+
+          // Populate other state variables...
+        } else {
+          console.log("No such document!");
         }
-        // Set the item data object
-        setItemData(itemData);
-
-        // Populate other state variables...
-      } else {
-        console.log("No such document!");
+      } catch (error) {
+        console.error("Error fetching order:", error);
       }
-    } catch (error) {
-      console.error("Error fetching order:", error);
-    }
-  };
+    };
 
-  fetchOrder();
-}, [orderId]);
+    fetchOrder();
+  }, [orderId]);
 
   const handleInputChange = (fieldName, value) => {
     console.log(fieldName);
@@ -263,7 +265,11 @@ const EditOrder = () => {
   };
 
   const fittingOptions = [
-  "Designing", "Creation in Progress", "Available for Pickup", "Completed", "Cancelled"
+    "Designing",
+    "Creation in Progress",
+    "Available for Pickup",
+    "Completed",
+    "Cancelled",
   ];
 
   // Handler for dropdown change
@@ -272,206 +278,269 @@ const EditOrder = () => {
   };
 
   const handleSubmit = async (event) => {
-  event.preventDefault();
- var validation = 0;
-  if (item1Name === "" && item2Name === "" && item3Name === "" && item4Name === "" && item5Name === "") {
-    setShowErrorMessage("Please add at least one item");
-    validation = 1;
-    
-  }
- // Check if any required field is empty
-  if (
-    customerName === "" ||
-    mobileNumber === "" ||
-    eventDate === "" ||
-    filledDate === "" ||
-    jobOrderNo === "" ||
-    depositAmount === "" ||
-    address === "" ||
-    status === "" ||
-    (item1Name === "" && item2Name === "" && item3Name === "" && item4Name === "" && item5Name === "")
-    ||
-    (item1Price === "" && item2Price === "" && item3Price === "" && item4Price === "" && item5Price === "")
-    ||
-    (item1Qty === "" && item2Qty === "" && item3Qty === "" && item4Qty === "" && item5Qty === "")
-  ) {
-    // If any required field is empty, show a modal prompting the user to fill all required fields
-    setShowErrorModal(true);
-    validation = 1;
-    return;
-  }
+    event.preventDefault();
+    var validation = 0;
+   
+    // Check if any required field is empty
+    if (
+      customerName === "" ||
+      mobileNumber === "" ||
+      eventDate === "" ||
+      filledDate === "" ||
+      jobOrderNo === "" ||
+      depositAmount === "" ||
+      address === "" ||
+      status === ""
+    ) {
+      // If any required field is empty, show a modal prompting the user to fill all required fields
+      setShowErrorModal(true);
+      validation = 1;
+      return;
+    }
 
-  // Check if at least one item is added
- 
-  if(validation==0){
-  const order = {
-    fullName: customerName,
-    phoneNumber: mobileNumber,
-    customerEmail: email,
-    dueDate: eventDate,
-    filledupDate: filledDate,
-    jobOrderID: jobOrderNo,
-    totalprice: totalAmount,
-    deposit: depositAmount,
-      balance: Math.max(parseNumber(depositAmount) - parseNumber(totalAmount), 0), // Set balance to 0 if negative
-  address: address,
-    status: status,
-    item1name: item1Name,
-    item1price: item1Price,
-    item1qty: item1Qty,
-    item2name: item2Name,
-    item2price: item2Price,
-    item2qty: item2Qty,
-    item3name: item3Name,
-    item3price: item3Price,
-    item3qty: item3Qty,
-    item4name: item4Name,
-    item4price: item4Price,
-    item4qty: item4Qty,
-    item5name: item5Name,
-    item5price: item5Price,
-    item5qty: item5Qty,
+    // Check if at least one item is added
+
+    if (validation == 0) {
+      const order = {
+        fullName: customerName,
+        phoneNumber: mobileNumber,
+        customerEmail: email,
+        dueDate: eventDate,
+        filledupDate: filledDate,
+        jobOrderID: jobOrderNo,
+        totalprice: totalAmount,
+        deposit: depositAmount,
+        balance: Math.max(
+          parseNumber(depositAmount) - parseNumber(totalAmount),
+          0
+        ), // Set balance to 0 if negative
+        address: address,
+        status: status,
+        item1name: item1Name,
+        item1price: item1Price,
+        item1qty: item1Qty,
+        item2name: item2Name,
+        item2price: item2Price,
+        item2qty: item2Qty,
+        item3name: item3Name,
+        item3price: item3Price,
+        item3qty: item3Qty,
+        item4name: item4Name,
+        item4price: item4Price,
+        item4qty: item4Qty,
+        item5name: item5Name,
+        item5price: item5Price,
+        item5qty: item5Qty,
+      };
+
+      try {
+        // Update the order in Firestore
+        await updateDoc(doc(firestore, "orders", orderId), order);
+        console.log("Order updated with ID: ", orderId);
+
+        // Redirect or perform any other actions after successful submission
+        navigate("/admin/orders"); // Redirect to a success page
+      } catch (error) {
+        console.error("Error updating order: ", error);
+        // Handle error
+      }
+    }
   };
-
-  try {
-    // Update the order in Firestore
-    await updateDoc(doc(firestore, "orders", orderId), order);
-    console.log("Order updated with ID: ", orderId);
-
-    // Redirect or perform any other actions after successful submission
-    navigate("/admin/orders"); // Redirect to a success page
-  } catch (error) {
-    console.error("Error updating order: ", error);
-    // Handle error
-  }
-}
-};
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
-  // placeholder rows
- const CardCustomerDetails = [
-  {
-    bordered: true,
-    fields: [
-      {
-        fieldType: "input",
-        label: "Customer Name",
-        type: "text",
-        placeholder: customerName,
-        width: 6,
-      },
-      {
-        fieldType: "input",
-        label: "Email",
-        type: "text",
-        placeholder: email,
-        width: 6,
-      },
-      {
-        fieldType: "input",
-        label: "Address",
-        type: "text",
-        placeholder: address,
-        width: 8,
-      },
-      {
-        fieldType: "input",
-        label: "Mobile Number",
-        type: "tel",
-        placeholder: mobileNumber,
-        width: 4,
-      },
-    ],
-  },
-  {
-    bordered: false,
-    fields: [
-      { fieldType: "input", label: "Filled Date/Date Ordered", type: "date", width: 4 , placeholder: filledDate},
-      {
-        fieldType: "input",
-        label: "Event Date",
-        type: "date",
-        placeholder: eventDate,
-        width: 6,
-      },
-      
-    ],
-  },
-];
 
-const CardOrderOverview = [
-  {
-    bordered: true,
-    fields: [
+  const CardCustomerDetails = [
+    {
+      bordered: false,
+      fields: [
+        {
+          fieldType: "input",
+          label: "Customer Name",
+          type: "text",
+          placeholder: customerName,
+          width: 12,
+        },
+      ],
+    },
+    {
+      bordered: false,
+      fields: [
+        {
+          fieldType: "input",
+          label: "Address",
+          type: "text",
+          placeholder: address,
+          width: 12,
+        },
+      ],
+    },
+    {
+      bordered: false,
+      fields: [
+        {
+          fieldType: "input",
+          label: "Email",
+          type: "text",
+          placeholder: email,
+          width: 7,
+        },
+        {
+          fieldType: "input",
+          label: "Mobile Number",
+          type: "tel",
+          placeholder: mobileNumber,
+          width: 5,
+        },
+      ],
+    },
+  ];
+
+  const CardOrderOverview = [
+    {
+      bordered: false,
+      fields: [
+        {
+          fieldType: "input",
+          label: "Job Order No.",
+          type: "text",
+          placeholder: jobOrderNo,
+          width: 6,
+        },
+        {
+          fieldType: "select",
+          label: "Status",
+          width: 6,
+          options: [
+            { label: "Designing" },
+            { label: "Creation in Progress" },
+            { label: "Available for Pickup" },
+            { label: "Completed" },
+            { label: "Cancelled" },
+          ],
+        },
+      ],
+    },
+    {
+      bordered: true,
+      fields: [
+        {
+          fieldType: "input",
+          label: "Deposit Amount",
+          type: "number",
+          placeholder: depositAmount,
+          width: 12,
+        },
+      ],
+    },
+    {
+      bordered: false,
+      fields: [
+        { fieldType: "input", label: "Due Date", type: "date", width: 12 },
+      ],
+    },
+  ];
+
+  const CardAddItems = Object.keys(itemData).map(
+    (key, index) => (
       {
-        fieldType: "input",
-        label: "Job Order No.",
-        type: "text",
-        placeholder: jobOrderNo,
-        width: 8,
-      },
-    ],
-  },
-  {
-    bordered: false,
-    fields: [
+        bordered: true,
+        fields: [
+          {
+            fieldType: "input",
+            label: `Name of Item`,
+            type: "text",
+            index: index,
+            placeholder: itemData[key].name,
+            width: 6,
+          },
+          {
+            fieldType: "input",
+            label: `Price`,
+            type: "number",
+            index: index,
+            placeholder: itemData[key].price,
+            width: 4,
+          },
+          {
+            fieldType: "input",
+            label: `Qty`,
+            type: "number",
+            index: index,
+            placeholder: itemData[key].qty,
+            width: 2,
+          },
+        ],
+      }
+      // Commented for visual difference
       // {
-      //   fieldType: "input",
-      //   label: "Deposit Amount",
-      //   type: "number",
-      //   placeholder: depositAmount,
-      //   width: 12,
-      // },
-    ],
-  },
-];
+      //   bordered: false,
+      //   fields: [
+      //     {
+      //       fieldType: "table",
+      //       tableData: [
+      //         {
+      //           Qty: 1,
+      //           Item: "Lorem ipsum dolor sit amet dous novativa si deux ex machina",
+      //           Price: "₱ " + 30,
+      //         },
+      //         { Qty: 2, Item: "Lorem ipsum dolor sit amet", Price: "₱ " + 25 },
+      //         { Qty: 3, Item: "Lorem ipsum dolor sit amet", Price: "₱ " + 40 },
+      //         { Qty: 4, Item: "Lorem ipsum dolor sit amet", Price: "₱ " + 10000 },
+      //       ],
+      //       tableColumns: ["Qty", "Item", "Price"],
+      //       total: "100,000.00",
+      //       deposit: "100,000.00",
+      //       balance: "100,000.00",
+      //       width: 12,
+      //     },
+      //   ],
+      // }
+    )
+  );
 
-const CardAddItems = Object.keys(itemData).map((key, index) => ({
-  bordered: true,
-  fields: [
-    {
-      fieldType: "input",
-      label: `Item name #${index + 1}`,
-      type: "text",
-      placeholder: itemData[key].name,
-      width: 4,
-    },
-    {
-      fieldType: "input",
-      label: `Item #${index + 1} Price`,
-      type: "number",
-      placeholder: itemData[key].price,
-      width: 4,
-    },
-    {
-      fieldType: "input",
-      label: `Item #${index + 1} Qty`,
-      type: "number",
-      placeholder: itemData[key].qty,
-      width: 4,
-    },
-  ],
-}));
 
-// Add an empty bordered object at the end
-CardAddItems.push({ bordered: false, fields: [] });
+  // const CardAddItems = Object.keys(itemData).map((key, index) => ({
+  //   bordered: true,
+  //   fields: [
+  //     {
+  //       fieldType: "input",
+  //       label: `Item name #${index + 1}`,
+  //       type: "text",
+  //       placeholder: itemData[key].name,
+  //       width: 4,
+  //     },
+  //     {
+  //       fieldType: "input",
+  //       label: `Item #${index + 1} Price`,
+  //       type: "number",
+  //       placeholder: itemData[key].price,
+  //       width: 4,
+  //     },
+  //     {
+  //       fieldType: "input",
+  //       label: `Item #${index + 1} Qty`,
+  //       type: "number",
+  //       placeholder: itemData[key].qty,
+  //       width: 4,
+  //     },
+  //   ],
+  // }));
 
+  // Add an empty bordered object at the end
+  CardAddItems.push({ bordered: false, fields: [] });
 
   return (
     <div id="page-top">
       <div id="wrapper">
-        {/* Sidebar component */}
         <Sidebar
           isSidebarCollapsed={isSidebarCollapsed}
           toggleSidebar={toggleSidebar}
         />
         <div id="content-wrapper" className="d-flex flex-column">
           <div id="content">
-            {/* Navbar component */}
             <div className="container-fluid py-4">
-              {/* Heading */}
               <div className="row">
                 <div className="col-lg-12">
                   <div className="card">
@@ -486,43 +555,27 @@ CardAddItems.push({ bordered: false, fields: [] });
                         </button>
                       </h1>
                       <button
-  className="btn btn-green mr-2 d-flex align-items-center"
-  onClick={handleSubmit} // Call handleSubmit when clicked
->
-  <FaArrowRight className="mr-3" />
-  <h1 className="heading">Update Order</h1>
-</button>
+                        className="btn btn-green mr-2 d-flex align-items-center"
+                        onClick={handleSubmit}
+                      >
+                        <FaArrowRight className="mr-3" />
+                        <h1 className="heading">Update Order</h1>
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
-              {/* Form */}
               <form onSubmit={handleSubmit}>
                 <div className="row">
-                  {/* Left Div */}
-                  <div className="col-lg-5">
+                  <div className="col-lg-6 mt-4">
                     <Card
                       header="Customer Details"
                       subheading="Step 1"
                       rows={CardCustomerDetails}
                       onChange={handleInputChange}
                     />
-                    <div className="form-group">
-                      <label htmlFor="fittingSchedule">Fitting Status</label>
-                      <select
-                        className="form-control"
-                        id="fittingSchedule"
-                        value={status}
-                        onChange={handleFittingChange}
-                      >
-                        <option value="">Select fitting status</option>
-                        {fittingOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                  </div>
+                  <div className="col-lg-6 mt-4">
                     <Card
                       header="Order Overview"
                       subheading="Step 2"
@@ -530,49 +583,47 @@ CardAddItems.push({ bordered: false, fields: [] });
                       onChange={handleInputChange}
                     />
                   </div>
-                  {/* Right Div */}
-
-                  <div className="col-lg-7">
-                    {/* Dropdown for fitting schedule */}
-
-                    <div>
-                      
-                      <Card
-                        header="Add Items"
-                        subheading="Step 3"
-                        rows={CardAddItems}
-                        onChange={handleInputChange}
-                      />
-                      <label className="w-100 card-input-label">
-                        Total Price
-                      </label>
-                      <input
-                        type="number"
-                        disabled
-                        className="w-100 card-input mb-2"
-                        value={totalAmount}
-                      />
-                      <label className="w-100 card-input-label">Balance</label>
-                      <input
-                        type="number"
-                        disabled
-                        className="w-100 card-input mb-2"
-                         value={Math.max(totalAmount - depositAmount, 0)}
-                      />
+                </div>
+                <hr className="my-4 mx-3" />
+                <div className="row">
+                  <div className="col-lg-12">
+                    <Card
+                      header="Add Items"
+                      subheading="Step 3"
+                      rows={CardAddItems}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+              </form>
+              <div className="row mt-4">
+                <div className="col-lg-12">
+                  <div className="card">
+                    <div className="card-title d-flex justify-content-end">
+                      <button
+                        className="btn btn-green mr-2 d-flex align-items-center"
+                        onClick={handleSubmit}
+                      >
+                        <FaArrowRight className="mr-3" />
+                        <h1 className="heading">Update Order</h1>
+                      </button>
                     </div>
                   </div>
                 </div>
-                {/* <button type="submit">Update Order</button> */}
-              </form>
-               <Modal
-        isOpen={showErrorModal}
-        onRequestClose={handleCloseErrorModal}
-        style={customStyles}
-        contentLabel="Error Modal"
-      >
-        <h2 className="text-black">Please fill all required fields</h2> <br/><p className="text-black">{showErrorMessage}</p>
-        <button onClick={handleCloseErrorModal} className="text-black">Close</button>
-      </Modal>
+              </div>
+              <Modal
+                isOpen={showErrorModal}
+                onRequestClose={handleCloseErrorModal}
+                style={customStyles}
+                contentLabel="Error Modal"
+              >
+                <h2 className="text-black">Please fill all required fields</h2>{" "}
+                <br />
+                <p className="text-black">{showErrorMessage}</p>
+                <button onClick={handleCloseErrorModal} className="text-black">
+                  Close
+                </button>
+              </Modal>
             </div>
           </div>
         </div>

@@ -19,6 +19,7 @@ import { FaArrowRight } from "react-icons/fa6";
 import Card from "../../Orders/components/Card/Card";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
+import CryptoJS from 'crypto-js';
 
 const AddUser = () => {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ const AddUser = () => {
           lastName: lastName,
           emailAddress: emailAddress,
           phoneNumber: mobileNumber,
-          password: password,
+          password: CryptoJS.AES.encrypt(password, '<JHGFytguhkjhjgvcfrhtfjgh').toString(),
           dateAdded: new Date(),
           addedBy: localStorage.getItem('email'),
           uid: user.uid,
@@ -66,7 +67,7 @@ const AddUser = () => {
 
   const newAdminDetails = [
     {
-      bordered: true,
+      bordered: false,
       fields: [
         {
           fieldType: "input",
@@ -84,12 +85,17 @@ const AddUser = () => {
           width: 6,
           id: "lastName",
         },
+      ],
+    },
+    {
+      bordered: true,
+      fields:[
         {
           fieldType: "input",
           label: "Email Address",
           placeholder: "example@email.com",
           type: "text",
-          width: 4,
+          width: 8,
           id: "emailAddress",
         },
         {
@@ -97,10 +103,10 @@ const AddUser = () => {
           label: "Mobile Number",
           type: "tel",
           placeholder: "09XX-XXX-XXXX",
-          width: 2,
+          width: 4,
           id: "mobileNumber",
         },
-      ],
+      ]
     },
     {
       bordered: false,
@@ -110,7 +116,7 @@ const AddUser = () => {
           label: "Password",
           type: "password",
           placeholder: "Set your password",
-          width: 4,
+          width: 6,
           id: "password",
         },
         {
@@ -118,13 +124,8 @@ const AddUser = () => {
           label: "Confirm Password",
           type: "password",
           placeholder: "Re-enter your password",
-          width: 4,
+          width: 6,
         },
-        // {
-        //   fieldType: "button",
-        //   text: "Add New User",
-        //   onClick: addUserdata,
-        // },
       ],
     },
   ];
@@ -188,7 +189,7 @@ const AddUser = () => {
               <form>
                 <div className="row">
                   {/* Left Div */}
-                  <div className="col-lg-12 mt-4">
+                  <div className="col-lg-8 mt-4">
                     <Card
                       header="New Admin User"
                       subheading=""

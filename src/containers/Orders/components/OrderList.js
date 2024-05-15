@@ -50,11 +50,28 @@ const OrderList = ({ setOrderId }) => {
     }
   };
 
-  const filterOrders = (orders) => {
-    return orders.filter((order) =>
-      order.fullName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  };
+
+const filterOrders = (orders) => {
+  if (!searchQuery) {
+    return orders;
+  }
+  return orders.filter((order) =>
+    (order.fullName?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    (order.item1name?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    (order.item2name?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    (order.item3name?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    (order.item4name?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    (order.item5name?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    (order.jobOrderID?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    
+    (order.filledupDate?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    (order.dueDate?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
+    (order.status?.toLowerCase()?.includes(searchQuery.toLowerCase()))
+  );
+};
+
+
+
 
   const sortedAndFilteredOrders = sortOrders(filterOrders([...allOrders]));
 
