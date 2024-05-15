@@ -1,0 +1,44 @@
+/* --------------- Color Backgrounds --------------------- */
+.bg-100-black {
+  background-color: #1A1A1A;
+}
+.bg-100 {
+  background-color: #1c1c1c;
+}
+.bg-80 {
+  background-color: #2C2C2C;
+}
+.bg-red {
+  background-color: #ff4647;
+}
+
+.bg-5 {
+  background-color: #fbf9f9;
+}
+
+.color-60{
+  color: #D0D2DB;
+}
+.color-red{
+  color: #ff4647;
+}
+
+/* Text */
+.logo {
+  font-size: 28px;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    font-weight: 300;
+    letter-spacing: 1px;
+    font-family: "Quintessential", sans-serif;
+}
+
+/* Sidebar */
+.sb-border {
+  border-right: 0.10rem solid #444444;
+}
+
+.topbar-border {
+  border-bottom: .10rem solid #444444;
+}

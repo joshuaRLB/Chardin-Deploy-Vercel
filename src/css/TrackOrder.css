@@ -1,0 +1,77 @@
+.bg-dark-gray{
+  background-color: #1c1c1c;
+}
+.bg-medium-gray{
+  background-color: #282828;
+}
+.progress {
+  background-color: #1c1c1c;
+}
+
+@media (max-width: 768px) {
+  .form-control.order-tracker-input {
+    width: 100%;
+    margin-bottom: 10px;
+    border-top-right-radius: 18px !important;
+    border-bottom-right-radius: 18px !important;
+  }
+
+  .input-group.mb-3 {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .input-group-text.rounded-end-4 {
+    border-top-left-radius: 15px !important;
+    border-bottom-left-radius: 15px !important;
+    width: 40%;
+  }
+}
+
+/* Track Order Modal */
+.track-order-modal {
+  overflow-x: hidden;
+}
+.track-order-modal .modal-content {
+  background-color: #282828;
+}
+.modal-content .btn-close {
+  filter: invert(1) grayscale(100%);
+}
+
+.track-order-modal .modal-header, .modal-body {
+  border: none;
+}
+
+.track-order-modal .modal-header {
+  border: none;
+  -webkit-box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 23px 10px rgba(0, 0, 0, 0.15);
+}
+
+.modal-table {
+  background-color: #282828;
+  width: 100%;
+  margin-bottom: 1rem;
+  color: white;
+  table-layout: fixed;
+}
+.modal-table th,
+.modal-table td {
+  padding: 0.9rem 0rem;
+  vertical-align: top;
+  font-size: 0.7rem;
+  border-bottom: 1px solid #323232;
+}
+.modal-table .starting-cell {
+  padding-left: 1.5rem;
+}
+.modal-table .ending-cell {
+  padding-right: 1.5rem;
+}
+
+.progress-track-section {
+  margin: 1rem;
+}
+

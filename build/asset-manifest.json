@@ -1,0 +1,36 @@
+{
+  "files": {
+    "main.css": "/chardin-react-node/static/css/main.c00df88d.css",
+    "main.js": "/chardin-react-node/static/js/main.8d0b8203.js",
+    "static/js/453.ee8c7a49.chunk.js": "/chardin-react-node/static/js/453.ee8c7a49.chunk.js",
+    "static/media/services-4.jpg": "/chardin-react-node/static/media/services-4.7877264d9862bd8a793e.jpg",
+    "static/media/services-1.jpg": "/chardin-react-node/static/media/services-1.d2272a458aaa955f07ce.jpg",
+    "static/media/services-3.jpg": "/chardin-react-node/static/media/services-3.1839e29c9f034fa3e4be.jpg",
+    "static/media/hero-bg.jpg": "/chardin-react-node/static/media/hero-bg.8461492c04cbfa0ecf5e.jpg",
+    "static/media/services-2.jpg": "/chardin-react-node/static/media/services-2.2d00df3a1bce49b1cf55.jpg",
+    "static/media/placeholder.jpg": "/chardin-react-node/static/media/placeholder.6761d7c1c069dcc91614.jpg",
+    "static/media/dsgr - rob.jpg": "/chardin-react-node/static/media/dsgr - rob.54c80f0622a4f90a4bf5.jpg",
+    "static/media/dsgr - aris.jpg": "/chardin-react-node/static/media/dsgr - aris.f0922fa52f4fcdb7a1a3.jpg",
+    "static/media/bootstrap-icons.woff?": "/chardin-react-node/static/media/bootstrap-icons.39795c0b4513de014cf8.woff",
+    "static/media/bootstrap-icons.woff2?": "/chardin-react-node/static/media/bootstrap-icons.b7bcc075b395c14ce8c2.woff2",
+    "static/media/dsgr - chard.jpg": "/chardin-react-node/static/media/dsgr - chard.a130148b966ccf1c66ce.jpg",
+    "static/media/about-bg.jpg": "/chardin-react-node/static/media/about-bg.b59a25f107f78ab4d3d1.jpg",
+    "static/media/about.jpg": "/chardin-react-node/static/media/about.47b5b24b00ac5c55ae9b.jpg",
+    "static/media/brand-logo.svg": "/chardin-react-node/static/media/brand-logo.79bf3f2bc8d5d49d7d667caa708f3145.svg",
+    "static/media/logo.svg": "/chardin-react-node/static/media/logo.e819b2f064074c18d132367f7fa0cb00.svg",
+    "static/media/undraw_profile.svg": "/chardin-react-node/static/media/undraw_profile.86b42d1a15a6f41e7e5055500adb9d04.svg",
+    "index.html": "/chardin-react-node/index.html",
+    "static/media/Checked.svg": "/chardin-react-node/static/media/Checked.3dfc701393377ac824e356f5e894f963.svg",
+    "static/media/Arrow-back-hover.svg": "/chardin-react-node/static/media/Arrow-back-hover.67cb83e367ce5b0f87daceff71f3c967.svg",
+    "static/media/Arrow-next.svg": "/chardin-react-node/static/media/Arrow-next.21888e60523141c4cb84ee3b1740fdcc.svg",
+    "static/media/Arrow-back.svg": "/chardin-react-node/static/media/Arrow-back.24392b718416a72ee3b0c6578575649c.svg",
+    "static/media/Unchecked.svg": "/chardin-react-node/static/media/Unchecked.76acee8a54a43c5bce2b74f62b9d082d.svg",
+    "main.c00df88d.css.map": "/chardin-react-node/static/css/main.c00df88d.css.map",
+    "main.8d0b8203.js.map": "/chardin-react-node/static/js/main.8d0b8203.js.map",
+    "453.ee8c7a49.chunk.js.map": "/chardin-react-node/static/js/453.ee8c7a49.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c00df88d.css",
+    "static/js/main.8d0b8203.js"
+  ]
+}
